@@ -1,0 +1,9 @@
+A L’EAU – Bon d’intervention chiffré pour iPad
+
+1. Publier TOUS les fichiers de ce dossier ensemble dans un répertoire HTTPS de votre site (par exemple /bon-ipad/).
+2. Sur l’iPad, ouvrir https://votre-site/bon-ipad/ dans Safari.
+3. Safari > Partager > Sur l’écran d’accueil > Ajouter.
+4. Ouvrir l’icône une première fois avec Internet, attendre le chargement, puis tester en mode avion : ajouter une ligne, faire une photo, signer et exporter.
+5. Le stockage reste sur l’iPad, sans synchronisation automatique vers Google Drive. Exporter régulièrement le dossier JSON et/ou PDF vers Fichiers.
+IMPORTANT : ne pas ouvrir index.html dans l’aperçu Fichiers. Il faut un hébergement HTTPS pour installer le fonctionnement hors ligne.
+Ne pas considérer la sauvegarde fiable avant les tests sur votre iPad.
