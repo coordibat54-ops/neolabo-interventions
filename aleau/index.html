@@ -8,6 +8,7 @@
 <meta name="apple-mobile-web-app-title" content="VISITE FUITE">
 <link rel="apple-touch-icon" href="./icône-visite-fuite.png">
 <title>A L'EAU - Visite fuite</title>
+
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#edf3f9;color:#17304d;font-family:Arial,sans-serif}
@@ -26,20 +27,33 @@ textarea{min-height:90px}
 input[type=checkbox]{width:21px;height:21px;vertical-align:middle}
 button{background:#1265a3;color:white;border:0;border-radius:8px;padding:13px 18px;font-size:16px;cursor:pointer;margin:6px 4px 6px 0}
 button.secondary{background:#64748b}
+button.danger{background:#a33d3d}
 .photo{border:1px solid #d3dfeb;padding:15px;margin:12px 0;border-radius:10px}
 .photo img{display:block;max-width:100%;max-height:420px;margin:12px auto}
+.photo input[type=file]{display:block;width:100%;margin:10px 0;font-size:16px}
 #signature{display:block;width:100%;height:190px;background:white;border:2px dashed #7898b5;border-radius:8px;touch-action:none}
 .actions{text-align:center}
-@media(max-width:650px){.grid,.checks{grid-template-columns:1fr}section{padding:15px}}
-@media print{body{background:white}section{box-shadow:none;border:1px solid #ddd;break-inside:avoid}button,input[type=file],.actions{display:none!important}textarea{resize:none}header{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+@media(max-width:650px){
+.grid,.checks{grid-template-columns:1fr}
+section{padding:15px}
+}
+@media print{
+body{background:white}
+section{box-shadow:none;border:1px solid #ddd;break-inside:avoid}
+button,input[type=file],.actions{display:none!important}
+textarea{resize:none}
+header{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
 </style>
 </head>
+
 <body>
 <header>
 <h1>A L'EAU <small>by COORDIBAT</small></h1>
 <p>VISITE DE CHANTIER - SUITE À RECHERCHE DE FUITE</p>
 <p>4 rue Piroux - 54000 Nancy</p>
 </header>
+
 <main>
 <section>
 <h2>01 - Identification du dossier</h2>
@@ -93,7 +107,7 @@ button.secondary{background:#64748b}
 
 <section>
 <h2>04 - Reportage photographique</h2>
-<p>Ajoute autant de photos que nécessaire, avec un commentaire pour chacune.</p>
+<p>Prends directement tes photos avec l'iPad ou sélectionne-les dans la galerie. Ajoute un commentaire sous chaque photo.</p>
 <div id="photos"></div>
 <button type="button" onclick="ajouterPhoto()">+ Ajouter une photo</button>
 </section>
@@ -145,16 +159,20 @@ button.secondary{background:#64748b}
 </section>
 </main>
 
+<footer style="text-align:center;padding:20px;color:#456">
+COORDIBAT - 4 rue Piroux, 54000 Nancy - SIRET 103 542 478 00013
+</footer>
+
 <script>
 const canvas=document.getElementById("signature");
 const ctx=canvas.getContext("2d");
 let dessin=false;
 
 function adapterCanvas(){
-const image=canvas.toDataURL();
-canvas.width=canvas.clientWidth*devicePixelRatio;
-canvas.height=canvas.clientHeight*devicePixelRatio;
-ctx.scale(devicePixelRatio,devicePixelRatio);
+const ratio=window.devicePixelRatio||1;
+canvas.width=canvas.clientWidth*ratio;
+canvas.height=canvas.clientHeight*ratio;
+ctx.scale(ratio,ratio);
 ctx.strokeStyle="#17304d";
 ctx.lineWidth=3;
 ctx.lineCap="round";
@@ -166,6 +184,7 @@ function position(e){
 const r=canvas.getBoundingClientRect();
 return {x:e.clientX-r.left,y:e.clientY-r.top};
 }
+
 canvas.addEventListener("pointerdown",e=>{
 e.preventDefault();
 dessin=true;
@@ -173,6 +192,8 @@ canvas.setPointerCapture(e.pointerId);
 const p=position(e);
 ctx.beginPath();
 ctx.moveTo(p.x,p.y);
+ctx.lineTo(p.x+.1,p.y+.1);
+ctx.stroke();
 });
 canvas.addEventListener("pointermove",e=>{
 if(!dessin)return;
@@ -184,36 +205,77 @@ ctx.stroke();
 function terminer(){dessin=false}
 canvas.addEventListener("pointerup",terminer);
 canvas.addEventListener("pointercancel",terminer);
+
 function effacerSignature(){
 ctx.clearRect(0,0,canvas.width,canvas.height);
 }
 
 let compteur=0;
+
 function ajouterPhoto(){
 compteur++;
 const div=document.createElement("div");
 div.className="photo";
+
 const titre=document.createElement("strong");
 titre.textContent="Photo "+compteur;
+
+const zone=document.createElement("input");
+zone.placeholder="Pièce / zone photographiée";
+
 const fichier=document.createElement("input");
 fichier.type="file";
 fichier.accept="image/*";
+fichier.setAttribute("capture","environment");
+
+const galerie=document.createElement("input");
+galerie.type="file";
+galerie.accept="image/*";
+
+const labelCamera=document.createElement("label");
+labelCamera.textContent="Prendre une photo avec l'iPad";
+
+const labelGalerie=document.createElement("label");
+labelGalerie.textContent="Ou choisir une photo existante";
+
 const img=document.createElement("img");
+img.style.display="none";
+
 const commentaire=document.createElement("textarea");
 commentaire.placeholder="Commentaire / constatation / travaux à prévoir";
+
 const supprimer=document.createElement("button");
 supprimer.type="button";
-supprimer.className="secondary";
+supprimer.className="danger";
 supprimer.textContent="Supprimer cette photo";
 supprimer.onclick=()=>div.remove();
-fichier.onchange=()=>{
-const f=fichier.files[0];
+
+function chargerPhoto(input){
+const f=input.files[0];
 if(!f)return;
 const lecteur=new FileReader();
-lecteur.onload=()=>img.src=lecteur.result;
-lecteur.readAsDataURL(f);
+lecteur.onload=()=>{
+img.src=lecteur.result;
+img.style.display="block";
 };
-div.append(titre,document.createElement("br"),fichier,img,commentaire,supprimer);
+lecteur.readAsDataURL(f);
+}
+
+fichier.onchange=()=>chargerPhoto(fichier);
+galerie.onchange=()=>chargerPhoto(galerie);
+
+div.append(
+titre,
+document.createElement("br"),
+zone,
+labelCamera,
+fichier,
+labelGalerie,
+galerie,
+img,
+commentaire,
+supprimer
+);
 document.getElementById("photos").appendChild(div);
 }
 
@@ -225,8 +287,9 @@ value:e.value,
 checked:e.checked
 }));
 localStorage.setItem("visite_fuite_champs",JSON.stringify(donnees));
-alert("Champs sauvegardés sur cet appareil. Les photos et la signature ne sont pas sauvegardées : exporte le PDF avant de fermer.");
+alert("Champs sauvegardés. Attention : photos et signature non conservées dans le brouillon. Exporte le PDF avant de fermer.");
 }
+
 function restaurer(){
 try{
 const donnees=JSON.parse(localStorage.getItem("visite_fuite_champs")||"null");
