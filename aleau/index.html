@@ -1,17 +1,245 @@
-<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Visite de chantier — A L'EAU</title><style>:root{font-family:Arial,sans-serif;color:#17304d;background:#edf3f9}*{box-sizing:border-box}body{margin:0}header{background:#123b67;color:white;padding:24px 5%}header h1{margin:0;font-size:27px}header p{margin:6px 0}main{max-width:1050px;margin:auto;padding:18px}section{background:white;border-radius:12px;padding:20px;margin:14px 0;box-shadow:0 2px 8px #17304d18}h2{color:#12518a;border-bottom:2px solid #dce9f6;padding-bottom:10px;font-size:20px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}label{font-weight:bold;font-size:14px;display:block;margin:10px 0 5px}input:not([type=checkbox]):not([type=file]),textarea,select{width:100%;border:1px solid #aebfd1;border-radius:7px;padding:12px;font-size:16px;background:#fff}textarea{min-height:85px}.checks{display:flex;flex-wrap:wrap;gap:12px}.checks label{padding:9px;background:#edf4fa;border-radius:7px}.photo{border:1px solid #cad9e8;border-radius:9px;padding:12px;margin:12px 0}.photo img{max-width:100%;max-height:320px;display:block;margin:8px auto}.btn{background:#1265a5;color:white;border:0;padding:13px 18px;border-radius:8px;font-weight:bold;font-size:15px;margin:6px 5px 6px 0;cursor:pointer}.secondary{background:#48657d}.danger{background:#a33d3d}footer{text-align:center;padding:20px;color:#456}@media(max-width:650px){.grid{grid-template-columns:1fr}}@media print{body{background:white}header{print-color-adjust:exact}.no-print{display:none}section{box-shadow:none;border:1px solid #ddd;break-inside:avoid}textarea{height:auto}}canvas#signature{width:100%;height:180px;border:2px solid #9eb8d0;border-radius:8px;background:#fff;touch-action:none;display:block} @media print{canvas#signature{height:140px}} </style></head><body><header><h1>A L'EAU <small>by COORDIBAT</small></h1><p>VISITE DE CHANTIER • SUITE À RECHERCHE DE FUITE / DÉGÂT DES EAUX</p></header><main><section><h2>01 — Identification du dossier</h2><div class="grid"><div><label>Client / assuré</label><input placeholder="Nom et prénom"></div><div><label>Date de visite</label><input type="date"></div><div><label>Adresse du sinistre</label><input placeholder="Adresse complète"></div><div><label>Téléphone</label><input type="tel"></div><div><label>Référence sinistre / assurance</label><input></div><div><label>Référence rapport de recherche de fuite</label><input></div><div><label>Intervenant</label><input placeholder="Jean Gé / autre"></div><div><label>Présents lors de la visite</label><input></div></div></section><section><h2>02 — Constat des dommages</h2><div class="checks"><label><input type="checkbox"> Fuite active</label><label><input type="checkbox"> Fuite réparée</label><label><input type="checkbox"> Humidité</label><label><input type="checkbox"> Moisissures</label><label><input type="checkbox"> Plafond</label><label><input type="checkbox"> Murs</label><label><input type="checkbox"> Sol</label><label><input type="checkbox"> Douche / baignoire</label><label><input type="checkbox"> Cuisine</label><label><input type="checkbox"> Autres</label></div><label>Constat général et origine indiquée dans le rapport</label><textarea placeholder="Décrire les désordres visibles, les zones concernées, les limites du constat..."></textarea><label>Mesures / dimensions / accès</label><textarea></textarea></section><section><h2>03 — Reportage photographique</h2><p>Ajoute autant de photos que nécessaire, avec une zone et un commentaire pour chacune.</p><div id="photos"></div><button class="btn no-print" type="button" onclick="addPhoto()">+ Ajouter une photo</button></section><section><h2>04 — Travaux à prévoir</h2><div class="checks"><label><input type="checkbox"> Mise en sécurité</label><label><input type="checkbox"> Plomberie</label><label><input type="checkbox"> Dépose sanitaire</label><label><input type="checkbox"> Dépose revêtements</label><label><input type="checkbox"> Assèchement</label><label><input type="checkbox"> Plâtrerie</label><label><input type="checkbox"> Peinture</label><label><input type="checkbox"> Carrelage / faïence</label><label><input type="checkbox"> Sols</label><label><input type="checkbox"> Électricité</label></div><label>Détail des travaux et quantités</label><textarea style="min-height:150px"></textarea><label>Points à vérifier / investigations complémentaires</label><textarea></textarea></section><section><h2>05 — Observations et validation</h2><label>Réserves / remarques du client</label><textarea></textarea><div class="grid"><div><label>Nom du client / représentant</label><input></div><div><label>Date</label><input type="date"></div></div><p><label>Signature du client (doigt, stylet ou souris)</label><canvas id="signature" width="900" height="240" aria-label="Zone de signature du client"></canvas><button type="button" class="btn secondary no-print" onclick="clearSignature()">Effacer la signature</button></p></section><section class="no-print"><button class="btn" onclick="window.print()">Imprimer / Enregistrer en PDF</button><button class="btn secondary" onclick="saveDraft()">Sauvegarder la saisie sur cet appareil</button><p style="font-size:13px">Les photos sont conservées dans cette page pendant la visite et intégrées à l'impression PDF. La sauvegarde locale mémorise les champs texte et cases cochées, pas les photos : génère le PDF avant de fermer la page.</p></section></main><footer>COORDIBAT — 4 rue Piroux, 54000 Nancy — SIRET 103 542 478 00013</footer><script>let count=0;let signatureCanvas,signatureCtx,signing=false;function clearSignature(){if(signatureCtx)signatureCtx.clearRect(0,0,signatureCanvas.width,signatureCanvas.height)}function setupSignature(){
- signatureCanvas=document.getElementById("signature");signatureCtx=signatureCanvas.getContext("2d");
- signatureCtx.strokeStyle="#17304d";signatureCtx.lineWidth=4;signatureCtx.lineCap="round";signatureCtx.lineJoin="round";
- signatureCanvas.style.touchAction="none";
- function point(e){const r=signatureCanvas.getBoundingClientRect();return {x:(e.clientX-r.left)*signatureCanvas.width/r.width,y:(e.clientY-r.top)*signatureCanvas.height/r.height}}
- function start(e){e.preventDefault();signing=true;let p=point(e);signatureCtx.beginPath();signatureCtx.moveTo(p.x,p.y);signatureCtx.lineTo(p.x+.1,p.y+.1);signatureCtx.stroke()}
- function move(e){if(!signing)return;e.preventDefault();let p=point(e);signatureCtx.lineTo(p.x,p.y);signatureCtx.stroke()}
- function stop(e){if(e&&e.cancelable)e.preventDefault();signing=false}
- // Touch events explicitly supported for Safari on older iPads and local HTML previews.
- signatureCanvas.addEventListener("touchstart",e=>{if(e.cancelable)e.preventDefault();if(e.touches.length)start(e.touches[0])},{passive:false});
- signatureCanvas.addEventListener("touchmove",e=>{if(e.cancelable)e.preventDefault();if(e.touches.length)move(e.touches[0])},{passive:false});
- signatureCanvas.addEventListener("touchend",stop,{passive:false});signatureCanvas.addEventListener("touchcancel",stop,{passive:false});
- // Mouse and pen: ignore touch pointer events to avoid duplicate strokes.
- if(window.PointerEvent){signatureCanvas.addEventListener("pointerdown",e=>{if(e.pointerType==="touch")return;start(e);try{signatureCanvas.setPointerCapture(e.pointerId)}catch(_) {}});signatureCanvas.addEventListener("pointermove",e=>{if(e.pointerType!=="touch")move(e)});signatureCanvas.addEventListener("pointerup",e=>{if(e.pointerType!=="touch")stop(e)});signatureCanvas.addEventListener("pointercancel",stop)}
- else {signatureCanvas.addEventListener("mousedown",start);window.addEventListener("mousemove",move);window.addEventListener("mouseup",stop)}
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="VISITE FUITE">
+<link rel="apple-touch-icon" href="./icône-visite-fuite.png">
+<title>A L'EAU - Visite fuite</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#edf3f9;color:#17304d;font-family:Arial,sans-serif}
+header{background:#123b67;color:white;padding:24px 5%}
+header h1{margin:0;font-size:27px}
+header p{margin:8px 0}
+main{max-width:950px;margin:auto;padding:16px}
+section{background:white;padding:22px;margin:18px 0;border-radius:12px;box-shadow:0 2px 10px #0001}
+h2{color:#123b67;border-bottom:2px solid #dce9f5;padding-bottom:10px}
+label{display:block;font-weight:bold;margin:13px 0 6px}
+input:not([type=checkbox]):not([type=file]),textarea,select{width:100%;padding:12px;border:1px solid #bdcbd9;border-radius:7px;font:inherit}
+textarea{min-height:90px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.checks label{font-weight:normal}
+input[type=checkbox]{width:21px;height:21px;vertical-align:middle}
+button{background:#1265a3;color:white;border:0;border-radius:8px;padding:13px 18px;font-size:16px;cursor:pointer;margin:6px 4px 6px 0}
+button.secondary{background:#64748b}
+.photo{border:1px solid #d3dfeb;padding:15px;margin:12px 0;border-radius:10px}
+.photo img{display:block;max-width:100%;max-height:420px;margin:12px auto}
+#signature{display:block;width:100%;height:190px;background:white;border:2px dashed #7898b5;border-radius:8px;touch-action:none}
+.actions{text-align:center}
+@media(max-width:650px){.grid,.checks{grid-template-columns:1fr}section{padding:15px}}
+@media print{body{background:white}section{box-shadow:none;border:1px solid #ddd;break-inside:avoid}button,input[type=file],.actions{display:none!important}textarea{resize:none}header{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head>
+<body>
+<header>
+<h1>A L'EAU <small>by COORDIBAT</small></h1>
+<p>VISITE DE CHANTIER - SUITE À RECHERCHE DE FUITE</p>
+<p>4 rue Piroux - 54000 Nancy</p>
+</header>
+<main>
+<section>
+<h2>01 - Identification du dossier</h2>
+<div class="grid">
+<div><label>Date de visite</label><input type="date"></div>
+<div><label>Référence dossier</label><input placeholder="VF-2026-001"></div>
+<div><label>Nom du client</label><input></div>
+<div><label>Téléphone</label><input type="tel"></div>
+</div>
+<label>Adresse du chantier</label><textarea></textarea>
+<label>Adresse e-mail</label><input type="email">
+<label>Compagnie d'assurance</label><input>
+<label>Numéro de sinistre</label><input>
+<label>Rapport de recherche de fuite</label><input placeholder="Référence / date">
+<label>Entreprise ayant réalisé la recherche</label><input>
+</section>
+
+<section>
+<h2>02 - Origine et localisation de la fuite</h2>
+<div class="checks">
+<label><input type="checkbox"> Alimentation eau froide</label>
+<label><input type="checkbox"> Alimentation eau chaude</label>
+<label><input type="checkbox"> Évacuation EU/EV</label>
+<label><input type="checkbox"> Chauffage</label>
+<label><input type="checkbox"> Étanchéité douche</label>
+<label><input type="checkbox"> Étanchéité baignoire</label>
+<label><input type="checkbox"> Infiltration extérieure</label>
+<label><input type="checkbox"> Origine non confirmée</label>
+</div>
+<label>Localisation précise</label><textarea></textarea>
+<label>Observations sur le rapport de recherche</label><textarea></textarea>
+</section>
+
+<section>
+<h2>03 - Dommages constatés</h2>
+<div class="checks">
+<label><input type="checkbox"> Plafond</label>
+<label><input type="checkbox"> Murs</label>
+<label><input type="checkbox"> Sol</label>
+<label><input type="checkbox"> Cloisons</label>
+<label><input type="checkbox"> Carrelage</label>
+<label><input type="checkbox"> Faïence</label>
+<label><input type="checkbox"> Mobilier</label>
+<label><input type="checkbox"> Isolation</label>
+<label><input type="checkbox"> Installation électrique</label>
+<label><input type="checkbox"> Autres dommages</label>
+</div>
+<label>Description des dommages</label><textarea></textarea>
+<label>Dimensions / surfaces / métrés</label><textarea></textarea>
+</section>
+
+<section>
+<h2>04 - Reportage photographique</h2>
+<p>Ajoute autant de photos que nécessaire, avec un commentaire pour chacune.</p>
+<div id="photos"></div>
+<button type="button" onclick="ajouterPhoto()">+ Ajouter une photo</button>
+</section>
+
+<section>
+<h2>05 - Travaux à prévoir</h2>
+<div class="checks">
+<label><input type="checkbox"> Recherche complémentaire</label>
+<label><input type="checkbox"> Réparation plomberie</label>
+<label><input type="checkbox"> Dépose sanitaire</label>
+<label><input type="checkbox"> Dépose carrelage</label>
+<label><input type="checkbox"> Dépose cloison</label>
+<label><input type="checkbox"> Assèchement</label>
+<label><input type="checkbox"> Plâtrerie</label>
+<label><input type="checkbox"> Peinture</label>
+<label><input type="checkbox"> Revêtement de sol</label>
+<label><input type="checkbox"> Électricité</label>
+<label><input type="checkbox"> Remise en état sanitaire</label>
+<label><input type="checkbox"> Autres travaux</label>
+</div>
+<label>Description détaillée des travaux</label><textarea></textarea>
+<label>Contraintes d'accès / observations techniques</label><textarea></textarea>
+</section>
+
+<section>
+<h2>06 - Conclusion de la visite</h2>
+<div class="checks">
+<label><input type="checkbox"> Devis à établir</label>
+<label><input type="checkbox"> Intervention urgente</label>
+<label><input type="checkbox"> Visite complémentaire</label>
+<label><input type="checkbox"> Accord assurance nécessaire</label>
+</div>
+<label>Observations générales</label><textarea></textarea>
+<label>Nom du technicien</label><input>
+</section>
+
+<section>
+<h2>07 - Signature du client</h2>
+<p>Signature directement au doigt sur iPad.</p>
+<label>Nom du signataire</label><input>
+<canvas id="signature"></canvas>
+<button type="button" class="secondary" onclick="effacerSignature()">Effacer la signature</button>
+<p>Signature attestant de la visite et des constatations effectuées, sans constituer une acceptation de devis.</p>
+</section>
+
+<section class="actions">
+<button type="button" onclick="window.print()">Exporter / Enregistrer en PDF</button>
+<button type="button" class="secondary" onclick="sauvegarder()">Sauvegarder les champs</button>
+</section>
+</main>
+
+<script>
+const canvas=document.getElementById("signature");
+const ctx=canvas.getContext("2d");
+let dessin=false;
+
+function adapterCanvas(){
+const image=canvas.toDataURL();
+canvas.width=canvas.clientWidth*devicePixelRatio;
+canvas.height=canvas.clientHeight*devicePixelRatio;
+ctx.scale(devicePixelRatio,devicePixelRatio);
+ctx.strokeStyle="#17304d";
+ctx.lineWidth=3;
+ctx.lineCap="round";
+ctx.lineJoin="round";
 }
-function addPhoto(){let id=++count;let d=document.createElement('div');d.className='photo';d.innerHTML=`<strong>Photo ${id}</strong><label>Pièce / zone</label><input placeholder="Ex. Salle de bain, mur gauche"><label>Prendre ou sélectionner une photo</label><input type="file" accept="image/*" capture="environment" onchange="preview(this)"><img alt="Aperçu photo" style="display:none"><label>Commentaire / désordre constaté</label><textarea placeholder="Description, mesures, préconisations..."></textarea><button type="button" class="btn danger no-print" onclick="this.parentNode.remove()">Supprimer cette photo</button>`;document.getElementById('photos').appendChild(d)}function preview(el){let f=el.files[0];if(!f)return;let reader=new FileReader;reader.onload=e=>{let im=el.parentNode.querySelector('img');im.src=e.target.result;im.style.display='block'};reader.readAsDataURL(f)}function saveDraft(){let data=[...document.querySelectorAll('input:not([type=file]),textarea')].map(x=>x.type==='checkbox'?x.checked:x.value);try{localStorage.setItem('aleau-visite',JSON.stringify(data));alert('Champs sauvegardés sur cet appareil (hors photos).')}catch(e){alert('Sauvegarde impossible sur ce navigateur.')}}window.onload=()=>{setupSignature();addPhoto();try{let d=JSON.parse(localStorage.getItem('aleau-visite')||'null');if(d){document.querySelectorAll('input:not([type=file]),textarea').forEach((x,i)=>{if(d[i]!==undefined){if(x.type==='checkbox')x.checked=d[i];else x.value=d[i]}})}}catch(e){}};</script></body></html>
+adapterCanvas();
+
+function position(e){
+const r=canvas.getBoundingClientRect();
+return {x:e.clientX-r.left,y:e.clientY-r.top};
+}
+canvas.addEventListener("pointerdown",e=>{
+e.preventDefault();
+dessin=true;
+canvas.setPointerCapture(e.pointerId);
+const p=position(e);
+ctx.beginPath();
+ctx.moveTo(p.x,p.y);
+});
+canvas.addEventListener("pointermove",e=>{
+if(!dessin)return;
+e.preventDefault();
+const p=position(e);
+ctx.lineTo(p.x,p.y);
+ctx.stroke();
+});
+function terminer(){dessin=false}
+canvas.addEventListener("pointerup",terminer);
+canvas.addEventListener("pointercancel",terminer);
+function effacerSignature(){
+ctx.clearRect(0,0,canvas.width,canvas.height);
+}
+
+let compteur=0;
+function ajouterPhoto(){
+compteur++;
+const div=document.createElement("div");
+div.className="photo";
+const titre=document.createElement("strong");
+titre.textContent="Photo "+compteur;
+const fichier=document.createElement("input");
+fichier.type="file";
+fichier.accept="image/*";
+const img=document.createElement("img");
+const commentaire=document.createElement("textarea");
+commentaire.placeholder="Commentaire / constatation / travaux à prévoir";
+const supprimer=document.createElement("button");
+supprimer.type="button";
+supprimer.className="secondary";
+supprimer.textContent="Supprimer cette photo";
+supprimer.onclick=()=>div.remove();
+fichier.onchange=()=>{
+const f=fichier.files[0];
+if(!f)return;
+const lecteur=new FileReader();
+lecteur.onload=()=>img.src=lecteur.result;
+lecteur.readAsDataURL(f);
+};
+div.append(titre,document.createElement("br"),fichier,img,commentaire,supprimer);
+document.getElementById("photos").appendChild(div);
+}
+
+function sauvegarder(){
+const champs=[...document.querySelectorAll("input:not([type=file]),textarea")];
+const donnees=champs.map(e=>({
+type:e.type,
+value:e.value,
+checked:e.checked
+}));
+localStorage.setItem("visite_fuite_champs",JSON.stringify(donnees));
+alert("Champs sauvegardés sur cet appareil. Les photos et la signature ne sont pas sauvegardées : exporte le PDF avant de fermer.");
+}
+function restaurer(){
+try{
+const donnees=JSON.parse(localStorage.getItem("visite_fuite_champs")||"null");
+if(!donnees)return;
+const champs=[...document.querySelectorAll("input:not([type=file]),textarea")];
+champs.forEach((e,i)=>{
+if(!donnees[i])return;
+e.value=donnees[i].value;
+if(e.type==="checkbox")e.checked=donnees[i].checked;
+});
+}catch(e){}
+}
+restaurer();
+</script>
+</body>
+</html>
